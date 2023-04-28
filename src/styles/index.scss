@@ -51,3 +51,12 @@
 #eq{
     grid-area:6/3/7/5;
 }
+.debug{
+    position:absolute;
+    top:1rem;
+    left:1rem;
+    background-color: red;
+    width: fit-content;
+    padding:1rem;
+    font-size: 2rem;
+}
