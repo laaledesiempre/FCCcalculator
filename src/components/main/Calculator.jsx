@@ -1,19 +1,62 @@
 import {changeDisplay,changeInnerState,changeLoad} from "../../store/slices/calculator"
 import { useDispatch, useSelector } from "react-redux"
+import { useEffect } from "react";
 
 export const Calculator = () => {
   const display = useSelector((state) => state.calculatorReducer.display);
   const innerState = useSelector((state) => state.calculatorReducer.innerState);
   const load = useSelector((state) => state.calculatorReducer.load);
   const dispatch=useDispatch()
+  const resolveEquations=(arr)=>{
+    const [first,operation,second,sign]=arr
+    let result;
+    switch(operation) {
+      case "+":
+        result=parseFloat(first)+parseFloat(second)
+        console.log(result)
+        return [result,sign]
+      case "-":
+        result=parseFloat(first)-parseFloat(second)
+        return [result,sign]
+      case "*":
+        result=parseFloat(first)*parseFloat(second)
+        return [result,sign]
+      case "/":
+        result=parseFloat(first)/parseFloat(second)
+        return [result,sign]
+      default:
+      console.log("something went wrong")
+      break
+    }
+  }
+  useEffect(()=>{
+    if (load.length>3) {
+      let results=resolveEquations(load)
+      let [result,key]=results
+      const fixin=(data)=>{
+        const numberf=parseFloat(data).toFixed(2)
+        return numberf.toString()
+      }
+      dispatch(changeDisplay(fixin(result)+key))
+      dispatch(changeLoad([result,key]))
+    }
+    // eslint-disable-next-line
+  },[load])
   const calculatorButton=(key)=>{
-    if (key!=="+" && key!=="-" && key!=="/" && key!=="*" && key!==".") {
+    if (key!=="+" && key!=="-" && key!=="/" && key!=="*" && key!=="." && key!=="0") {
       dispatch(changeDisplay(display+key))
       dispatch(changeInnerState(innerState+key))
-    } else if(!innerState.includes(".") && key==="." && innerState.length>0)
-    {
+    } else if(!innerState.includes(".") && key==="." && innerState.length>0){ 
       dispatch(changeDisplay(display+key))
       dispatch(changeInnerState(innerState+key))
+    } else if(key==="0" && innerState.length>0 && !innerState.includes("0")){ 
+      dispatch(changeDisplay(display+key))
+      dispatch(changeInnerState(innerState+key))
+    } else if(!innerState.includes("0") && key==="0" && innerState.length===0){
+      dispatch(changeDisplay(display+key+"."))
+      dispatch(changeInnerState(innerState+key+"."))
+    } else if(innerState.includes("0") && key==="0"){
+
     } else if(key==="-" && display.length===0) {
       dispatch(changeDisplay(display+key))
       dispatch(changeInnerState(key))
@@ -28,18 +71,43 @@ export const Calculator = () => {
       console.log(display[display.length-1])
       dispatch(changeDisplay(display+key))
       dispatch(changeInnerState(innerState+key))
-    } else {
-      dispatch(changeLoad([...load,innerState]))
-      dispatch(changeDisplay("result"+key))
+    } else if(key==="+" || key==="-" || key==="/" || key==="*"){
+      dispatch(changeLoad([...load,innerState,key]))
+      dispatch(changeDisplay(load))
       dispatch(changeInnerState(""))
-      dispatch(changeLoad(["result",key]))
+      dispatch(changeLoad([...load,innerState,key]))
     }
     
   }
+  
   const reset=()=>{
     dispatch(changeDisplay(""))
     dispatch(changeInnerState(""))
     dispatch(changeLoad([]))
+  }
+  const equals=()=>{
+    console.log(load.length)
+    console.log(load)
+    if(load.length===2 && innerState.length>0) {
+      const [result,key]=resolveEquations([...load,innerState])
+      console.log(result)
+      dispatch(changeInnerState(""))
+      dispatch(changeDisplay(result))
+      dispatch(changeLoad([result]))
+      console.log(load)
+    } else if (load.length===3 && load[1]==="") {
+      const [result,key]=resolveEquations([load[0],load[2],innerState])
+      dispatch(changeInnerState(""))
+      dispatch(changeDisplay(result))
+      dispatch(changeLoad([result]))
+      console.log(load)
+    } else {
+      const [result,key]=resolveEquations([load[0]+load[1],load[2],innerState])
+      dispatch(changeInnerState(""))
+      dispatch(changeDisplay(result))
+      dispatch(changeLoad([result]))
+    }
+    
   }
   return <>
   <section className="calculator-container">
@@ -60,7 +128,7 @@ export const Calculator = () => {
     <button className="calc-operation" id="-" onClick={()=>{calculatorButton("-")}}>-</button>
     <button className="calc-utility" id="." onClick={()=>{calculatorButton(".")}}>.</button>
     <button className="calc-number" id="0" onClick={()=>{calculatorButton("0")}}>0</button>
-    <button className="calc-utility" id="eq" onClick={()=>{calculatorButton("=")}}>=</button> 
+    <button className="calc-utility" id="eq" onClick={()=>{equals()}}>=</button> 
   </section>
   <section className="debug">
     <p >display: {display}</p>
