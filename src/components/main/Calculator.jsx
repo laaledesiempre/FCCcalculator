@@ -91,27 +91,19 @@ export const Calculator = () => {
     if(load.length===2 && innerState.length>0) {
       const [result,key]=resolveEquations([...load,innerState])
       console.log(result)
-      dispatch(changeInnerState(""))
-      dispatch(changeDisplay(result))
-      dispatch(changeLoad([result]))
+      const fixin=(data)=>{
+        const numberf=parseFloat(data).toFixed(2)
+        return numberf.toString()
+      }
+      dispatch(changeInnerState(fixin(result)))
+      dispatch(changeDisplay(fixin(result)))
+      dispatch(changeLoad([]))
       console.log(load)
-    } else if (load.length===3 && load[1]==="") {
-      const [result,key]=resolveEquations([load[0],load[2],innerState])
-      dispatch(changeInnerState(""))
-      dispatch(changeDisplay(result))
-      dispatch(changeLoad([result]))
-      console.log(load)
-    } else {
-      const [result,key]=resolveEquations([load[0]+load[1],load[2],innerState])
-      dispatch(changeInnerState(""))
-      dispatch(changeDisplay(result))
-      dispatch(changeLoad([result]))
     }
-    
   }
   return <>
   <section className="calculator-container">
-    <div className="calc-display">def</div>
+    <div className="calc-display">{display}</div>
     <button className="calc-utility" id="c" onClick={()=>{reset()}}>c</button>
     <button className="calc-operation" id="/" onClick={()=>{calculatorButton("/")}}>/</button>
     <button className="calc-number" id="7" onClick={()=>{calculatorButton("7")}}>7</button>

@@ -3,9 +3,9 @@ import {createSlice} from "@reduxjs/toolkit"
 const calculator=createSlice({
     name:"calculator",
     initialState:{
-        display:"test",
-        innerState:"test",
-        load:["test","test"]
+        display:"",
+        innerState:"",
+        load:[]
     },
     reducers:{
         setDisplay: (state,action)=>{
